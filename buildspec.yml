@@ -8,15 +8,20 @@ env:
 phases:
   pre_build:
     commands:
+      - echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID"
+      - echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
+      - aws ecr describe-repositories --repository-names penguinshop-dev || echo "ECR repo not found"
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
       - echo Build started on `date`
+      - docker images
       - echo Building the Docker image...
       - docker build -t penguinshop-dev ./app
       - docker tag penguinshop-dev:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/penguinshop-dev:latest
+      - docker images
   post_build:
     commands:
       - echo Pushing the Docker image...

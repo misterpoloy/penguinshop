@@ -23,7 +23,7 @@ The architecture is modular, with separate stacks for core infrastructure, CI/CD
 ## 📂 Project Structure
 ```
 penguinshop/
-├── app/                        # (Your application source code)
+├── app/                       
 ├── documentation/
 │   └── application_elements.md
 ├── infra/
@@ -34,7 +34,7 @@ penguinshop/
 │       ├── penguinshop-stack.ts
 │       ├── penguinshop-pipeline-stack.ts
 │       └── penguinshop-trafficshift-lambda.ts
-├── app/                  # (Usually at the root or in /app)
+├── app/                  
 │   └── dockerfile
 ```
 
@@ -65,9 +65,11 @@ penguinshop/
    - Generate a classic token (`ghp_...`) with `repo` and `workflow` scopes.
 
 2. **Create a `.env` file in `/infra`**  
-GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx AWS_ACCOUNT_ID=your-aws-account-id AWS_REGION=us-east-1
-
-> **Note:** `/infra/.env` is git-ignored for security.
+```
+GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx AWS_ACCOUNT_ID=your-aws-account-id
+AWS_REGION=us-east-1
+```
+**Note:** `/infra/.env` is git-ignored for security.
 
 ---
 
@@ -79,33 +81,33 @@ GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx AWS_ACCOUNT_ID=your-aws-ac
 git clone https://github.com/your-org/penguinshop.git
 cd penguinshop
 ```
-2. Install Dependencies
+### 2. Install Dependencies
 ```
 cd infra
 npm install
 ```
 
-3. Bootstrap CDK (first time only)
+### 3. Bootstrap CDK (first time only)
 ```
 npx cdk bootstrap
 ```
 
-4. Build the CDK Project
+### 4. Build the CDK Project
 ```
 npm run build
 ```
 
-5. Deploy Core Infrastructure
+### 5. Deploy Core Infrastructure
 ```
 npx cdk deploy PenguinshopStack-dev
 ```
 
-6. Deploy the CI/CD Pipeline
+### 6. Deploy the CI/CD Pipeline
 ```
 npx cdk deploy PenguinshopPipelineStack-dev
 ```
 
-7. Push Your App Code to GitHub
+### 7. Push Your App Code to GitHub
 ```
 Ensure /app and buildspec.yml are in your repo root.
 Push to the main branch to trigger the pipeline.
@@ -114,11 +116,11 @@ Push to the main branch to trigger the pipeline.
 Ensure /app and buildspec.yml are in your repo root.
 Push to the main branch to trigger the pipeline.
 
-8. Monitor the Pipeline
+### 8. Monitor the Pipeline
 > Go to AWS Console → CodePipeline → penguinshop-cascade-pipeline
 Watch the stages: Source → Build → Deploy
 
-9. Access Your App
+### 9. Access Your App
 Find the ALB DNS name in the ECS service or CDK output.
 ```
 Visit http://<ALB-DNS-NAME>/ for your Hello World app.
