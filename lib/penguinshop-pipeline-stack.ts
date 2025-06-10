@@ -6,12 +6,22 @@ import * as codepipeline_actions from 'aws-cdk-lib/aws-codepipeline-actions';
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
-import * as iam from 'aws-cdk-lib/aws-iam';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 export class PenguinshopPipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+     // --- Add this block at the top of your constructor ---
+    const githubToken = process.env.GITHUB_TOKEN;
+    if (!githubToken) {
+      throw new Error('GITHUB_TOKEN must be set in your environment or .env file');
+    }
+    const githubSecret = new secretsmanager.Secret(this, 'GithubTokenSecret', {
+      secretName: 'GITHUB_TOKEN',
+      secretStringValue: cdk.SecretValue.unsafePlainText(githubToken),
+    });
 
     // Reference ECR repo
     const ecrRepo = ecr.Repository.fromRepositoryName(this, 'EcrRepo', 'penguinshop-dev');
@@ -46,9 +56,9 @@ export class PenguinshopPipelineStack extends cdk.Stack {
       actions: [
         new codepipeline_actions.GitHubSourceAction({
           actionName: 'GitHub_Source',
-          owner: 'your-github-username',
+          owner: 'misterpoloy', // replace
           repo: 'penguinshop',
-          oauthToken: cdk.SecretValue.secretsManager('GITHUB_TOKEN'),
+          oauthToken: githubSecret.secretValue,
           output: sourceOutput,
           branch: 'main',
         }),
