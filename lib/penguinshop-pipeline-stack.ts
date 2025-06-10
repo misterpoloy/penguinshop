@@ -82,7 +82,7 @@ export class PenguinshopPipelineStack extends cdk.Stack {
           }),
         });
 
-        const trafficShiftLambda = new PenguinshopTrafficShiftLambda(this, 'TrafficShift', {
+        const trafficShiftLambda = new PenguinshopTrafficShiftLambda(this, `TrafficShift-${env}`, {
           listenerArn: 'arn:aws:elasticloadbalancing:...', // provide actual ALB listener ARN 
           blueTargetGroupArn: 'arn:aws:elasticloadbalancing:...', // provide actual blue TG ARN
           greenTargetGroupArn: 'arn:aws:elasticloadbalancing:...', // provide actual green TG ARN

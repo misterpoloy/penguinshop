@@ -28,6 +28,7 @@
     "@aws-cdk/aws-ecs-patterns": "^1.204.0",
     "@aws-cdk/aws-iam": "^1.204.0",
     "aws-cdk-lib": "2.196.0",
+    "aws-sdk": "^2.1692.0",
     "constructs": "^10.0.0",
     "dotenv": "^16.5.0"
   }
