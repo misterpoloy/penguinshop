@@ -16,6 +16,8 @@ You will deploy a **Node.js Express "Hello World" app** (in `/app`) to AWS using
 - **AWS Lambda** for blue/green traffic shifting
 - **AWS Secrets Manager** for secure token storage
 
+![PenguinShop Architecture](documentation/images/cdicd_pipeline.png)
+
 The architecture is modular, with separate stacks for core infrastructure, CI/CD pipeline, and reusable constructs for blue/green deployments.
 
 ---
@@ -101,6 +103,8 @@ npm run build
 ```
 npx cdk deploy PenguinshopStack-dev
 ```
+Should see something like this:
+![PenguinShop Architecture](documentation/images/cdk_deploy.png)
 
 ### 6. Deploy the CI/CD Pipeline
 ```
