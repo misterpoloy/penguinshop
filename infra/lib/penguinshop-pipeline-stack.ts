@@ -23,8 +23,15 @@ export class PenguinshopPipelineStack extends cdk.Stack {
       secretStringValue: cdk.SecretValue.unsafePlainText(githubToken),
     });
 
+    const account = process.env.AWS_ACCOUNT_ID || cdk.Stack.of(this).account;
+    const region = process.env.AWS_REGION || cdk.Stack.of(this).region;
+
     // Reference ECR repo
-    const ecrRepo = ecr.Repository.fromRepositoryName(this, 'EcrRepo', 'penguinshop-dev');
+    const ecrRepo = ecr.Repository.fromRepositoryArn(
+      this, 
+      'EcrRepo', 
+      `arn:aws:ecr:${region}:${account}:repository/penguinshop-dev`
+    );
 
     // Lookup default VPC (or replace with custom VPC if needed)
     const vpc = ec2.Vpc.fromLookup(this, 'DefaultVpc', { isDefault: true });
@@ -77,9 +84,6 @@ export class PenguinshopPipelineStack extends cdk.Stack {
         }),
       ],
     });
-
-    const account = process.env.AWS_ACCOUNT_ID || process.env.CDK_DEFAULT_ACCOUNT;
-    const region = process.env.AWS_REGION || process.env.CDK_DEFAULT_REGION;
 
     // === Deploy Stages ===
     const envs = ['dev', 'qa', 'prod'];
