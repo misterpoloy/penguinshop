@@ -8,6 +8,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 export class PenguinshopPipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -27,11 +28,11 @@ export class PenguinshopPipelineStack extends cdk.Stack {
     const region = process.env.AWS_REGION || cdk.Stack.of(this).region;
 
     // Reference ECR repo
-    const ecrRepo = ecr.Repository.fromRepositoryArn(
-      this, 
-      'EcrRepo', 
-      `arn:aws:ecr:${region}:${account}:repository/penguinshop-dev`
-    );
+    const importedRepoName = cdk.Fn.importValue('penguinshop-dev');
+    const ecrRepo = ecr.Repository.fromRepositoryAttributes(this, 'EcrRepo', {
+      repositoryName: importedRepoName,
+      repositoryArn: `arn:aws:ecr:us-east-1:400017207288:repository/penguinshop-dev`,
+    });
 
     // Lookup default VPC (or replace with custom VPC if needed)
     const vpc = ec2.Vpc.fromLookup(this, 'DefaultVpc', { isDefault: true });
@@ -47,6 +48,20 @@ export class PenguinshopPipelineStack extends cdk.Stack {
         privileged: true, // needed for Docker
       },
     });
+
+    // Add explicit ECR permissions in case grantPullPush is insufficient
+    project.addToRolePolicy(new iam.PolicyStatement({
+      actions: [
+        'ecr:GetAuthorizationToken',
+        'ecr:BatchCheckLayerAvailability',
+        'ecr:GetDownloadUrlForLayer',
+        'ecr:InitiateLayerUpload',
+        'ecr:UploadLayerPart',
+        'ecr:CompleteLayerUpload',
+        'ecr:PutImage'
+      ],
+      resources: [ecrRepo.repositoryArn],
+    }));
 
     // Grant CodeBuild permission to push to ECR
     ecrRepo.grantPullPush(project);

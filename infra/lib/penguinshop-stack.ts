@@ -10,27 +10,29 @@ export class PenguinshopStack extends cdk.Stack {
 
     const env = this.node.tryGetContext('env') || 'dev';
 
-    // ECR repository
     const repo = new ecr.Repository(this, `PenguinshopRepo-${env}`, {
       repositoryName: `penguinshop-${env}`,
     });
 
-    // ECS Cluster
+    // 👇 Export the ECR repository name
+    new cdk.CfnOutput(this, 'PenguinshopRepoNameExport', {
+      value: repo.repositoryName,
+      exportName: 'penguinshop-dev', // 👈 MUST match what you'll import with
+    });
+
     const cluster = new ecs.Cluster(this, `PenguinshopCluster-${env}`, {
       clusterName: `penguinshop-cluster-${env}`,
     });
 
-    // Fargate Service with ALB
     new ecsPatterns.ApplicationLoadBalancedFargateService(this, `PenguinshopService-${env}`, {
       cluster,
       taskImageOptions: {
-        image: ecs.ContainerImage.fromEcrRepository(repo),
-        containerPort: 3000,
+        image: ecs.ContainerImage.fromRegistry('public.ecr.aws/docker/library/nginx:latest'),
+        containerPort: 80,
       },
       publicLoadBalancer: true,
     });
 
-    // Tags for cleanup + cost tracking
     cdk.Tags.of(this).add('Workshop', 'PenguinShop');
     cdk.Tags.of(this).add('Environment', env);
   }

@@ -25,6 +25,7 @@ phases:
   post_build:
     commands:
       - echo Pushing the Docker image...
+      - echo pipeline version 1...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/penguinshop-dev:latest
       - echo Build completed on `date`
 artifacts:
