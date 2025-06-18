@@ -104,7 +104,7 @@ export class PenguinshopPipelineStack extends cdk.Stack {
     const envs = ['dev', 'qa', 'prod'];
     envs.forEach((env) => {
         const ecsService = ecs.FargateService.fromFargateServiceAttributes(this, `EcsService-${env}`, {
-          serviceArn: `arn:aws:ecs:${region}:${account}:service/penguinshop-cluster-${env}/penguinshop-service-${env}`,
+          serviceArn: `arn:aws:ecs:${region}:${account}:service/penguinshop-cluster-${env}/PenguinshopStack-${env}-PenguinshopServicedevService73CD6742-Om918T7ddBHE`,
           cluster: ecs.Cluster.fromClusterAttributes(this, `Cluster-${env}`, {
             clusterName: `penguinshop-cluster-${env}`,
             vpc: vpc,
