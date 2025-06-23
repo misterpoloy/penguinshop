@@ -68,7 +68,8 @@ penguinshop/
 
 2. **Create a `.env` file in `/infra`**  
 ```
-GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx AWS_ACCOUNT_ID=your-aws-account-id
+GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AWS_ACCOUNT_ID=your-aws-account-id
 AWS_REGION=us-east-1
 ```
 **Note:** `/infra/.env` is git-ignored for security.

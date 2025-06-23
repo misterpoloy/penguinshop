@@ -5,6 +5,7 @@ import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as path from 'path';               
 import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
+import * as iam from 'aws-cdk-lib/aws-iam'; // 👈 Asegúrate de tener esta línea también
 
 export class PenguinshopStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -40,6 +41,16 @@ export class PenguinshopStack extends cdk.Stack {
     );
 
     /* ------------------------------------------------------------------
+     * 🛡️ Rol de ejecución para tareas ECS (permite acceso a ECR, logs, etc.)
+     * ------------------------------------------------------------------ */
+    const executionRole = new iam.Role(this, `TaskExecutionRole-${env}`, {
+      assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonECSTaskExecutionRolePolicy'),
+      ],
+    });
+
+    /* ------------------------------------------------------------------
      * 4️⃣ Service Fargate con ALB
      * ------------------------------------------------------------------ */
     const service = new ecsPatterns.ApplicationLoadBalancedFargateService(
@@ -53,6 +64,7 @@ export class PenguinshopStack extends cdk.Stack {
           containerName: 'web',            // ↔️ coincide con buildspec.yml
           containerPort: 3000,
           environment: { NODE_ENV: 'production' },
+          executionRole,
         },
         serviceName: `penguinshop-service-${env}`, // ↔️ coincide con CodePipeline
       },
