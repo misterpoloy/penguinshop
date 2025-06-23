@@ -3,6 +3,8 @@ import { Construct } from 'constructs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
+import * as path from 'path';               
+import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
 
 export class PenguinshopStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -10,29 +12,65 @@ export class PenguinshopStack extends cdk.Stack {
 
     const env = this.node.tryGetContext('env') || 'dev';
 
+    /* ------------------------------------------------------------------
+     * 1️⃣ ECR: Repo creation
+     * ------------------------------------------------------------------ */
     const repo = new ecr.Repository(this, `PenguinshopRepo-${env}`, {
       repositoryName: `penguinshop-${env}`,
     });
 
-    // 👇 Export the ECR repository name
     new cdk.CfnOutput(this, 'PenguinshopRepoNameExport', {
       value: repo.repositoryName,
-      exportName: 'penguinshop-dev', // 👈 MUST match what you'll import with
+      exportName: 'penguinshop-dev',
     });
 
+    /* ------------------------------------------------------------------
+     * 2️⃣ ECS: Cluster
+     * ------------------------------------------------------------------ */
     const cluster = new ecs.Cluster(this, `PenguinshopCluster-${env}`, {
       clusterName: `penguinshop-cluster-${env}`,
     });
 
-    new ecsPatterns.ApplicationLoadBalancedFargateService(this, `PenguinshopService-${env}`, {
-      cluster,
-      taskImageOptions: {
-        image: ecs.ContainerImage.fromRegistry('public.ecr.aws/docker/library/nginx:latest'),
-        containerPort: 80,
+    /* ------------------------------------------------------------------
+     * 3️⃣ Imagen “Hello World” construida en el *primer* deploy
+     * ------------------------------------------------------------------ */
+    const image = ecs.ContainerImage.fromAsset(
+      path.join(__dirname, '../../app'),
+      { platform: Platform.LINUX_AMD64 }
+    );
+
+    /* ------------------------------------------------------------------
+     * 4️⃣ Service Fargate con ALB
+     * ------------------------------------------------------------------ */
+    const service = new ecsPatterns.ApplicationLoadBalancedFargateService(
+      this,
+      `PenguinshopService-${env}`,
+      {
+        cluster,
+        publicLoadBalancer: true,
+        taskImageOptions: {
+          image,
+          containerName: 'web',            // ↔️ coincide con buildspec.yml
+          containerPort: 3000,
+          environment: { NODE_ENV: 'production' },
+        },
+        serviceName: `penguinshop-service-${env}`, // ↔️ coincide con CodePipeline
       },
-      publicLoadBalancer: true,
+    );
+
+    // Exportar el nombre del servicio para usarlo en el pipeline
+    new cdk.CfnOutput(this, `ServiceName-${env}`, {
+      value: service.service.serviceName,
+      exportName: `penguinshop-service-name-${env}`,
     });
 
+    /* Health-check del ALB hacia /health */
+    service.targetGroup.configureHealthCheck({
+      path: '/health',
+      healthyHttpCodes: '200',
+    });
+
+    /* Etiquetas */
     cdk.Tags.of(this).add('Workshop', 'PenguinShop');
     cdk.Tags.of(this).add('Environment', env);
   }

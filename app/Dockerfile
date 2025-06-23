@@ -1,4 +1,4 @@
-# FROM node:18-alpine
+# syntax=docker/dockerfile:1
 FROM public.ecr.aws/docker/library/node:18-alpine
 
 WORKDIR /usr/src/app
