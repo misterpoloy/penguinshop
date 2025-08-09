@@ -27,7 +27,8 @@ phases:
     commands:
       - echo Pushing the Docker image...
       - echo pipeline version 4...
-      - docker push 400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-dev:latest
+      - docker push 400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-jportiz:latest
+      # change to github username penguinshop-jportiz #changeGithubUsername
       - echo Build completed on `date`\- echo Writing imagedefinitions.json...
       - printf '[{"name":"web","imageUri":"400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-dev:latest"}]' > imagedefinitions.json
 artifacts:
