@@ -14,6 +14,7 @@ phases:
       - aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${ECR_URI}"
       - echo "Checking ECR repo ${REPO} (informational; repo should exist already)"
       - aws ecr describe-repositories --repository-names "${REPO}" >/dev/null 2>&1 || echo "WARN: ECR repo ${REPO} not found (ensure it exists)"
+
   build:
     commands:
       - echo "Build started on $(date)"
@@ -21,6 +22,7 @@ phases:
       - docker build -t "${REPO}:${IMAGE_TAG}" ./app
       - docker tag "${REPO}:${IMAGE_TAG}" "${ECR_URI}/${REPO}:${IMAGE_TAG}"
       - docker images
+
   post_build:
     commands:
       - echo "Pushing ${ECR_URI}/${REPO}:${IMAGE_TAG}..."
