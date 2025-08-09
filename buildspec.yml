@@ -20,8 +20,9 @@ phases:
       - echo Build started on `date`
       - docker images
       - echo Building the Docker image...
-      - docker build -t penguinshop-dev ./app
-      - docker tag penguinshop-dev:latest 400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-dev:latest
+      # change to github username penguinshop-jportiz #changeGithubUsername
+      - docker build -t penguinshop-jportiz ./app
+      - docker tag penguinshop-jportiz:latest 400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-jportiz:latest
       - docker images
   post_build:
     commands:
@@ -30,6 +31,7 @@ phases:
       - docker push 400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-jportiz:latest
       # change to github username penguinshop-jportiz #changeGithubUsername
       - echo Build completed on `date`\- echo Writing imagedefinitions.json...
-      - printf '[{"name":"web","imageUri":"400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-dev:latest"}]' > imagedefinitions.json
+      # change to github username penguinshop-jportiz #changeGithubUsername
+      - printf '[{"name":"web","imageUri":"400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-jportiz:latest"}]' > imagedefinitions.json
 artifacts:
   files: '**/*'
