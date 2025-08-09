@@ -1,36 +1,37 @@
 version: 0.2
 
+env:
+  variables:
+    AWS_ACCOUNT_ID: "400017207288"
+    AWS_DEFAULT_REGION: "us-east-1"
+
 phases:
   pre_build:
     commands:
-      - set -euo pipefail
-      - : "${ACCOUNT?Need ACCOUNT env var from CodeBuildAction}"
-      - : "${AWS_DEFAULT_REGION?Need AWS_DEFAULT_REGION env var from CodeBuildAction}"
-      - : "${REPO?Need REPO env var from CodeBuildAction}"
-      - IMAGE_TAG="${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}"
-      - ECR_URI="${ACCOUNT}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-      - echo "Logging in to Amazon ECR at ${ECR_URI}..."
+      - echo "AWS_ACCOUNT_ID=400017207288"
+      - echo "AWS_DEFAULT_REGION=us-east-1"
+      - aws ecr describe-repositories --repository-names penguinshop-jportiz || echo "ECR repo not found"
+      # change to github username penguinshop-jportiz #changeGithubUsername
+      - echo Logging in to Amazon ECR...
       - aws --version
-      - aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${ECR_URI}"
-      - echo "Checking ECR repo ${REPO} (informational; repo should exist already)"
-      - aws ecr describe-repositories --repository-names "${REPO}" >/dev/null 2>&1 || echo "WARN: ECR repo ${REPO} not found (ensure it exists)"
-
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 400017207288.dkr.ecr.us-east-1.amazonaws.com
   build:
     commands:
-      - echo "Build started on $(date)"
-      - echo "Building image ${REPO}:${IMAGE_TAG}..."
-      - docker build -t "${REPO}:${IMAGE_TAG}" ./app
-      - docker tag "${REPO}:${IMAGE_TAG}" "${ECR_URI}/${REPO}:${IMAGE_TAG}"
+      - echo Build started on `date`
       - docker images
-
+      - echo Building the Docker image...
+      # change to github username penguinshop-jportiz #changeGithubUsername
+      - docker build -t penguinshop-jportiz ./app
+      - docker tag penguinshop-jportiz:latest 400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-jportiz:latest
+      - docker images
   post_build:
     commands:
-      - echo "Pushing ${ECR_URI}/${REPO}:${IMAGE_TAG}..."
-      - docker push "${ECR_URI}/${REPO}:${IMAGE_TAG}"
-      - echo "Writing imagedefinitions.json for ECS (container name: web)"
-      - printf '[{"name":"web","imageUri":"%s/%s:%s"}]' "${ECR_URI}" "${REPO}" "${IMAGE_TAG}" > imagedefinitions.json
-      - echo "Build completed on $(date)"
-
+      - echo Pushing the Docker image...
+      - echo pipeline version 4...
+      - docker push 400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-jportiz:latest
+      # change to github username penguinshop-jportiz #changeGithubUsername
+      - echo Build completed on `date`\- echo Writing imagedefinitions.json...
+      # change to github username penguinshop-jportiz #changeGithubUsername
+      - printf '[{"name":"web","imageUri":"400017207288.dkr.ecr.us-east-1.amazonaws.com/penguinshop-jportiz:latest"}]' > imagedefinitions.json
 artifacts:
-  files:
-    - imagedefinitions.json
+  files: '**/*'
