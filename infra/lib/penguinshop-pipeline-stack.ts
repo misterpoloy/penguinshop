@@ -89,7 +89,11 @@ export class PenguinshopPipelineStack extends cdk.Stack {
       ],
     });
 
-    const envs = ['dev'];
+    // const envs = ['dev']; Uncomment this if no collision on other AWS accounts
+    // For multiple environments, you can use a context variable or similar to define them
+    const env = this.node.tryGetContext('env') || 'dev';
+    const envs = [env];
+
     envs.forEach((env) => {
       // Importamos el nombre y el cluster
       const serviceName = cdk.Fn.importValue(`penguinshop-service-name-${env}`);

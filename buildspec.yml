@@ -10,7 +10,8 @@ phases:
     commands:
       - echo "AWS_ACCOUNT_ID=400017207288"
       - echo "AWS_DEFAULT_REGION=us-east-1"
-      - aws ecr describe-repositories --repository-names penguinshop-dev || echo "ECR repo not found"
+      - aws ecr describe-repositories --repository-names penguinshop-jportiz || echo "ECR repo not found"
+      # change to github username penguinshop-jportiz #changeGithubUsername
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 400017207288.dkr.ecr.us-east-1.amazonaws.com

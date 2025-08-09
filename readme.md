@@ -101,15 +101,25 @@ npm run build
 ```
 
 ### 5. Deploy Core Infrastructure
+
+If you are running multiple lab in a single AWS instance:
 ```
-npx cdk deploy PenguinshopStack-dev
+npx cdk deploy PenguinshopStack-githubusername -c env=githubusername
 ```
+
+### 5.1 Change
+Open VS code and search for
+```
+#changeGithubUsername
+```
+Change in `buildspec.yml` for your github username to change ECR.
+
 Should see something like this:
 ![PenguinShop Architecture](documentation/images/cdk_deploy.png)
 
 ### 6. Deploy the CI/CD Pipeline
 ```
-npx cdk deploy PenguinshopPipelineStack-dev
+npx cdk deploy PenguinshopPipelineStack-githubusername -c env=githubusername
 ```
 
 ### 7. Push Your App Code to GitHub
